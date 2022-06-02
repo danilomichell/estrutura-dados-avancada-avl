@@ -4,12 +4,12 @@
     {
         private Node? _root;
 
+        #region [PRINT]
         public void ShowTree()
         {
             if (_root == null) Console.WriteLine("Árvore vazia...");
             else ShowTreeReadble(_root);
         }
-
         public void ShowTreeReadble(Node node, int nivel = 0, int lado = 0)
         {
             while (true)
@@ -35,13 +35,15 @@
                 break;
             }
         }
+        #endregion
 
+        #region [INSERT]
         public void Insert(int valor)
         {
             var newItem = new Node(valor);
             _root = _root == null ? newItem : RecursiveInsert(_root, newItem);
         }
-        private Node RecursiveInsert(Node? currentNode, Node insertNode)
+        private static Node RecursiveInsert(Node? currentNode, Node insertNode)
         {
             if (currentNode == null)
             {
@@ -62,34 +64,24 @@
             }
             return currentNode;
         }
-        private Node BalanceTree(Node currentNode)
+        #endregion
+
+        #region [FATOR DE BALANCEAMENTO]
+        private static Node BalanceTree(Node currentNode)
         {
             var balanceFactor = BalanceFactor(currentNode);
-            if (balanceFactor > 1)
+            currentNode = balanceFactor switch
             {
-                if (BalanceFactor(currentNode.Left!) > 0)
-                {
-                    //currentNode = RotateLL(currentNode);
-                }
-                else
-                {
-                    //currentNode = RotateLR(currentNode);
-                }
-            }
-            else if (balanceFactor < -1)
-            {
-                if (BalanceFactor(currentNode.Right!) > 0)
-                {
-                    //currentNode = RotateRL(currentNode);
-                }
-                else
-                {
-                    currentNode = RotateSingleToLeft(currentNode);
-                }
-            }
+                > 1 => BalanceFactor(currentNode.Left!) > 0
+                    ? RotateSingleToRight(currentNode)
+                    : RotateDoubleToLeft(currentNode),
+                < -1 => BalanceFactor(currentNode.Right!) > 0
+                    ? RotateDoubleToRight(currentNode)
+                    : RotateSingleToLeft(currentNode),
+                _ => currentNode
+            };
             return currentNode;
         }
-
         private static int BalanceFactor(Node currentNode)
         {
             var l = GetHeight(currentNode.Left!);
@@ -107,6 +99,7 @@
             height = m + 1;
             return height;
         }
+        #endregion
 
         #region [ROTAÇÕES]
         private static Node RotateSingleToLeft(Node parent)
@@ -118,7 +111,27 @@
             pivot.Left = parent;
             return pivot;
         }
+        private static Node RotateSingleToRight(Node parent)
+        {
+            parent.Left!.Dad = parent.Dad;
+            parent.Dad = parent.Left;
+            var pivot = parent.Left;
+            parent.Left = pivot!.Right;
+            pivot.Right = parent;
+            return pivot;
+        }
+        private static Node RotateDoubleToLeft(Node parent)
+        {
+            var pivot = parent.Left;
+            parent.Left = RotateSingleToLeft(pivot!);
+            return RotateSingleToRight(parent);
+        }
+        private static Node RotateDoubleToRight(Node parent)
+        {
+            var pivot = parent.Right;
+            parent.Right = RotateSingleToRight(pivot!);
+            return RotateSingleToLeft(parent);
+        }
         #endregion
-
     }
 }
