@@ -105,6 +105,11 @@
         private static Node RotateSingleToLeft(Node parent)
         {
             parent.Right!.Dad = parent.Dad;
+            if (parent.Right.Left is not null)
+            {
+                if (parent.Right.Left.Valor > parent.Valor)
+                    parent.Right.Left.Dad = parent;
+            }
             parent.Dad = parent.Right;
             var pivot = parent.Right;
             parent.Right = pivot!.Left;
@@ -114,6 +119,11 @@
         private static Node RotateSingleToRight(Node parent)
         {
             parent.Left!.Dad = parent.Dad;
+            if (parent.Left.Right is not null)
+            {
+                if (parent.Left.Right.Valor < parent.Valor)
+                    parent.Left.Right.Dad = parent;
+            }
             parent.Dad = parent.Left;
             var pivot = parent.Left;
             parent.Left = pivot!.Right;
